@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf2ec">
+  <meta name="description" content="用 Google Gemini 把教學主題變成可操作的課堂活動、討論題與學習成果要求。">
+  <title>課堂活動設計室</title>
+  <meta name="generation-api" content="https://classroom-activity-studio.savoryduck41.chatgpt.site/api/generate">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%20fill%3D%22none%22%3E%0A%20%20%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%2211%22%20fill%3D%22%23215342%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M20%2015c-3.6-2.5-7-3-11.5-2v15c4.5-1%207.9-.5%2011.5%202%203.6-2.5%207-3%2011.5-2V13c-4.5-1-7.9-.5-11.5%202v15m-7-12c1.4%200%202.4.2%203.6.8m-3.6%203.4c1.4%200%202.4.2%203.6.8%22%20stroke%3D%22%23f0f5e9%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3C%2Fsvg%3E%0A" type="image/svg+xml">
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #edf2ec;
+  --paper: #fffefa;
+  --ink: #19382e;
+  --text: #294238;
+  --muted: #556a60;
+  --green: #225543;
+  --green-dark: #163e31;
+  --line: #dae5dc;
+  --wash: #edf4e9;
+  --gold: #f4dd9e;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-size: 15px; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+button:focus-visible, a:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid #39795e;
+  outline-offset: 3px;
+}
+.wrap { width: min(1136px, calc(100% - 64px)); margin-inline: auto; }
+.symbols { position: absolute; width: 0; height: 0; overflow: hidden; }
+.icon { width: 19px; height: 19px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.site-header { border-bottom: 1px solid #dce5dc; background: #f7f9f3; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; min-height: 71px; gap: 12px; }
+.brand { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 760; letter-spacing: .045em; }
+.brand-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--green); color: #fff; box-shadow: 0 3px 8px #183e3029; }
+.brand-icon .icon { width: 22px; height: 22px; }
+.provider { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid #d9e4d7; border-radius: 24px; color: #3b6151; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.provider .icon { width: 14px; height: 14px; }
+
+.hero { position: relative; isolation: isolate; overflow: hidden; margin-top: 28px; padding: 35px 43px 37px; border-radius: 24px; background: linear-gradient(105deg, #1a4638 0%, #235444 62%, #386757 100%); color: #f9f9ec; }
+.hero::before { content: ""; z-index: -1; position: absolute; inset: 0 0 0 48%; background-image: radial-gradient(#d6edbe40 1px, transparent 1px); background-size: 15px 15px; mask-image: linear-gradient(90deg, transparent, #000); }
+.hero-content { position: relative; z-index: 1; }
+.eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 13px; color: #d1e6cb; font-size: 12px; font-weight: 700; letter-spacing: .14em; }
+.eyebrow span { width: 7px; height: 7px; border-radius: 50%; background: #d3e8a9; box-shadow: 0 0 0 4px #d3e8a922; }
+.hero h1 { margin: 0; color: inherit; font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif; font-size: clamp(2rem, 4.25vw, 3.42rem); line-height: 1.23; font-weight: 760; letter-spacing: .015em; }
+.hero h1 span { color: var(--gold); }
+.hero-description { max-width: 58%; margin: 12px 0 0; color: #e6efe1; line-height: 1.7; }
+.hero-art { position: absolute; z-index: 0; width: 330px; height: 210px; right: 22px; top: 50%; transform: translateY(-50%); }
+.small-break { display: none; }
+
+.workspace { display: grid; grid-template-columns: minmax(300px, .83fr) minmax(0, 1.25fr); align-items: start; gap: 20px; margin-top: 22px; }
+.card { min-width: 0; padding: 24px; background: var(--paper); border: 1px solid #dce6dc; border-radius: 20px; box-shadow: 0 6px 20px #293e3010; }
+.section-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.section-icon { display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; border-radius: 13px; background: var(--wash); color: var(--green); }
+.section-icon .icon { width: 22px; height: 22px; }
+.section-heading h2 { margin: 0; color: var(--ink); font-size: 19px; line-height: 1.35; letter-spacing: .025em; }
+.section-heading p { margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.field { display: grid; gap: 7px; min-width: 0; }
+.field + .field, .field-pair, .field-pair + .field { margin-top: 17px; }
+.field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.field-pair .field { margin: 0; }
+.label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+label { color: var(--ink); font-size: 13px; font-weight: 720; letter-spacing: .025em; }
+.required { color: #8b532b; }
+.field-note { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+input, textarea, select { width: 100%; min-width: 0; padding: 10px 11px; color: var(--ink); border: 1px solid #d5e1d7; border-radius: 9px; background: #fcfdfa; line-height: 1.5; }
+textarea { resize: vertical; min-height: 72px; }
+input::placeholder, textarea::placeholder { color: #60746a; opacity: 1; }
+input:focus, select:focus, textarea:focus { outline: 2px solid #b7d7bf; border-color: #53876c; }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.examples button { padding: 4px 9px; border: 1px solid #dce7db; border-radius: 16px; background: #f1f6ee; color: #3c5f4c; font-size: 12px; line-height: 1.4; }
+.examples button:hover { background: #e4efe1; border-color: #b7cdbd; }
+.generate { display: flex; align-items: center; justify-content: center; gap: 9px; position: relative; width: 100%; min-height: 46px; padding: 10px 35px; margin-top: 19px; border: 0; border-radius: 10px; background: var(--green); color: #fff; box-shadow: 0 4px 10px #24513b2a; font-weight: 740; letter-spacing: .04em; }
+.generate:hover:not(:disabled) { background: var(--green-dark); }
+.generate:disabled { cursor: progress; opacity: .75; }
+.generate-arrow { position: absolute; right: 13px; width: 17px; }
+.form-error { margin: 12px 0 0; border: 1px solid #f0cdbd; border-radius: 8px; padding: 8px 10px; color: #7b3729; background: #fff5ef; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+
+.results-heading { margin-bottom: 17px; }
+.copy-plan { display: flex; align-items: center; justify-content: center; gap: 6px; margin-left: auto; padding: 7px 10px; border: 1px solid #d7e3da; border-radius: 8px; background: #f9fcf7; color: var(--green); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.copy-plan:hover { background: var(--wash); }
+.copy-plan .icon { width: 15px; height: 15px; }
+.plan-intro { border: 1px solid #dce9da; border-radius: 13px; background: #f0f6ec; padding: 15px 16px; overflow-wrap: anywhere; }
+.sample-label { display: inline-block; border-radius: 20px; padding: 3px 8px; background: #dbead7; color: #2e5948; font-size: 11px; font-weight: 750; }
+.plan-intro h3 { margin: 7px 0 4px; color: var(--ink); font-size: 22px; line-height: 1.38; letter-spacing: .03em; }
+.plan-intro p { margin: 0; color: #445c50; font-size: 13px; line-height: 1.68; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 16px 0; padding: 4px; border-radius: 10px; background: #edf2eb; }
+.tabs button { display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; min-height: 35px; padding: 5px 4px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: #496255; font-size: 13px; white-space: nowrap; }
+.tabs button .icon { width: 16px; height: 16px; }
+.tabs button:hover { background: #e3ede2; }
+.tabs button[aria-selected="true"] { border-color: #e0e8de; background: var(--paper); color: var(--green-dark); box-shadow: 0 1px 4px #2d4b3216; font-weight: 750; }
+.panel { overflow-wrap: anywhere; }
+.panel h4 { margin: 0 0 9px; color: var(--ink); font-size: 15px; line-height: 1.5; letter-spacing: .025em; }
+.material-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; font-size: 12px; color: var(--muted); }
+.material-line > span { color: var(--green); font-weight: 720; }
+.material-line ul { display: flex; flex-wrap: wrap; gap: 0; list-style: none; padding: 0; margin: 0; }
+.material-line li:not(:last-child)::after { content: "、"; }
+.steps { list-style: none; counter-reset: steps; margin: 11px 0 0; padding: 0; }
+.steps li { position: relative; padding: 9px 0 9px 32px; border-top: 1px solid #e4ece2; counter-increment: steps; }
+.steps li::before { content: counter(steps, decimal-leading-zero); position: absolute; left: 0; top: 9px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: #e9f1e6; color: #2d5a48; font-size: 10px; font-weight: 800; }
+.step-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; color: var(--ink); font-size: 13px; }
+.step-time { flex: 0 0 auto; color: #3b6653; font-size: 11px; font-weight: 700; }
+.steps p, .prompt-list { font-size: 13px; line-height: 1.65; }
+.steps p { margin: 4px 0 0; color: #465d51; }
+.steps li:last-child { padding-bottom: 0; }
+.prompt-list { margin: 0; padding-inline-start: 22px; }
+.prompt-list li { padding: 9px 0 9px 4px; border-bottom: 1px solid #e4ece2; }
+.prompt-list li:last-child { border-bottom: 0; }
+.prompt-list li::marker { color: #2d5a48; font-weight: 750; }
+.results-card[aria-busy="true"] .plan-intro { opacity: .68; }
+.noscript { color: var(--muted); }
+.footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; padding-block: 23px; color: #52675b; font-size: 12px; }
+
+@media (max-width: 850px) {
+  .hero-art { width: 255px; right: 6px; }
+  .card { padding: 19px; }
+  .workspace { gap: 14px; }
+}
+@media (max-width: 680px) {
+  .wrap { width: calc(100% - 30px); }
+  .header-inner { min-height: 61px; }
+  .hero { margin-top: 16px; padding: 25px 20px; border-radius: 18px; }
+  .hero-description { max-width: 70%; font-size: 13px; }
+  .small-break { display: initial; }
+  .hero-art { width: 190px; height: auto; right: -23px; top: 49%; opacity: .72; }
+  .workspace { grid-template-columns: minmax(0, 1fr); margin-top: 15px; }
+}
+@media (max-width: 350px) {
+  .brand { font-size: 15px; gap: 6px; }
+  .brand-icon { width: 33px; height: 33px; }
+  .hero-art { opacity: .36; }
+  .hero-description { max-width: 100%; }
+  .card { padding: 15px; }
+  .tabs button .icon { display: none; }
+}
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" class="symbols" aria-hidden="true">
+    <symbol id="book" viewBox="0 0 24 24"><path d="M12 6.5C9.3 4.6 6.6 4.3 3 5v13c3.6-.7 6.3-.4 9 1.5 2.7-1.9 5.4-2.2 9-1.5V5c-3.6-.7-6.3-.4-9 1.5v13M6.5 9.1c1.1 0 2 .2 2.8.6m-2.8 2.7c1.1 0 2 .2 2.8.6"/></symbol>
+    <symbol id="sparkle" viewBox="0 0 24 24"><path d="M12 2.5c.7 5.8 3.7 8.8 9.5 9.5-5.8.7-8.8 3.7-9.5 9.5-.7-5.8-3.7-8.8-9.5-9.5 5.8-.7 8.8-3.7 9.5-9.5Z"/></symbol>
+    <symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="pencil" viewBox="0 0 24 24"><path d="m13.5 5.5 5 5M4 20l4.5-1 11-11a3.2 3.2 0 0 0-4.5-4.5l-11 11L3 21l1-1Z"/></symbol>
+    <symbol id="list" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 9h6m-6 6h6M8 9h.01M8 15h.01"/></symbol>
+    <symbol id="chat" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.6-2.7A7.5 7.5 0 1 1 20 11.5Z"/><path d="M9.5 10.5h6m-6 3h4"/></symbol>
+    <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 12h.01"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./" aria-label="課堂活動設計室首頁">
+        <span class="brand-icon"><svg class="icon" aria-hidden="true"><use href="#book"/></svg></span>
+        <span>課堂活動設計室</span>
+      </a>
+      <span class="provider"><svg class="icon" aria-hidden="true"><use href="#sparkle"/></svg>Google Gemini</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-content">
+        <p class="eyebrow"><span></span> 給老師的 AI 備課工具</p>
+        <h1 id="page-title">把教學靈感，<br class="small-break">變成<span>一堂好課。</span></h1>
+        <p class="hero-description">從一個主題出發，讓 Gemini 幫你設計實作活動、討論題與學習成果要求。</p>
+      </div>
+      <svg class="hero-art" viewBox="0 0 330 210" fill="none" aria-hidden="true">
+        <path d="M21 154c43-70 95-114 164-107 50 6 48 58 6 80-34 17-69-7-58-31 16-33 109-39 174 12M92 194c58-27 133-32 212-23" stroke="#81a18a" stroke-dasharray="3 7" opacity=".7"/>
+        <circle cx="252" cy="74" r="57" stroke="#91af98" opacity=".28"/>
+        <circle cx="252" cy="74" r="45" stroke="#91af98" opacity=".28"/>
+        <path d="M264 47c1 10 6 15 16 16-10 1-15 6-16 16-1-10-6-15-16-16 10-1 15-6 16-16Z" fill="#e8cc85"/>
+        <path d="M90 68c1 6 3 8 9 9-6 1-8 3-9 9-1-6-3-8-9-9 6-1 8-3 9-9Z" fill="#b9d8a7"/>
+        <path d="M285 147c1 7 4 10 11 11-7 1-10 4-11 11-1-7-4-10-11-11 7-1 10-4 11-11Z" fill="#b9d8a7"/>
+        <g transform="translate(115 47) rotate(9 57 64)">
+          <rect x="0" y="0" width="114" height="127" rx="12" fill="#759687"/>
+          <rect x="-6" y="-7" width="114" height="127" rx="12" fill="#ebf1df" stroke="#f6f5e6"/>
+          <path d="M15 30h35m-35 13h73m-73 15h73m-73 15h58m-58 15h39" stroke="#8ba58e" stroke-width="3" stroke-linecap="round"/>
+          <path d="m68 29 7 7 13-14" stroke="#427561" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10-13v14m20-14V1m20-14V1m20-14V1m20-14V1" stroke="#517c68" stroke-width="4" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </section>
+
+    <div class="workspace">
+      <section class="card form-card" aria-labelledby="form-title">
+        <div class="section-heading">
+          <span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#pencil"/></svg></span>
+          <div><h2 id="form-title">課程設定</h2><p>設定主題與教學情境</p></div>
+        </div>
+        <form id="activity-form" novalidate>
+          <div class="field">
+            <div class="label-row"><label for="topic">教學主題 <span class="required">*</span></label><span id="topic-count" class="field-note">0 / 160</span></div>
+            <input id="topic" name="topic" type="text" minlength="2" maxlength="160" placeholder="例如：校園減塑行動" required>
+            <div class="examples" aria-label="試用主題">
+              <button type="button" data-topic="校園減塑行動">校園減塑</button>
+              <button type="button" data-topic="水的三態變化">水的三態</button>
+              <button type="button" data-topic="辨識網路假訊息">媒體識讀</button>
+            </div>
+          </div>
+          <div class="field-pair">
+            <div class="field"><label for="grade">適用年級</label>
+              <select id="grade" name="grade">
+                <option value="">不限年級</option>
+                <option>國小低年級</option><option>國小中年級</option><option>國小高年級</option>
+                <option>國中</option><option>高中職</option><option>大專及成人</option>
+              </select>
+            </div>
+            <div class="field"><label for="duration">課堂時間</label>
+              <select id="duration" name="duration">
+                <option value="30">30 分鐘</option><option value="45" selected>45 分鐘</option>
+                <option value="60">60 分鐘</option><option value="90">90 分鐘</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label-row"><label for="focus">教學重點</label><span class="field-note">選填</span></div>
+            <textarea id="focus" name="focus" maxlength="240" rows="3" placeholder="例如：練習用觀察到的資料支持自己的想法"></textarea>
+          </div>
+          <button id="generate" class="generate" type="submit"><svg class="icon" aria-hidden="true"><use href="#sparkle"/></svg><span id="generate-label">生成課堂活動</span><svg class="icon generate-arrow" aria-hidden="true"><use href="#arrow"/></svg></button>
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="results" class="card results-card" aria-labelledby="results-heading">
+        <div class="section-heading results-heading">
+          <span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#list"/></svg></span>
+          <div><h2 id="results-heading">活動方案</h2><p>教案預覽與學習要求</p></div>
+          <button id="copy-plan" class="copy-plan" type="button"><svg class="icon" aria-hidden="true"><use href="#copy"/></svg><span>複製教案</span></button>
+        </div>
+        <p id="copy-status" class="sr-only" role="status"></p>
+        <div class="plan-intro" aria-live="polite">
+          <span id="sample-label" class="sample-label">設計範例</span>
+          <h3 id="result-title">校園減塑行動</h3>
+          <p id="result-summary"></p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="教案內容">
+          <button type="button" data-tab="activity" role="tab" id="tab-activity" aria-controls="panel-activity" aria-selected="true"><svg class="icon" aria-hidden="true"><use href="#list"/></svg>實作活動</button>
+          <button type="button" data-tab="questions" role="tab" id="tab-questions" aria-controls="panel-questions" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#chat"/></svg>討論題</button>
+          <button type="button" data-tab="outcomes" role="tab" id="tab-outcomes" aria-controls="panel-outcomes" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#target"/></svg>學習成果</button>
+        </div>
+        <div class="panel" data-panel="activity" role="tabpanel" id="panel-activity" aria-labelledby="tab-activity" tabindex="0">
+          <h4 id="result-activity-title"></h4>
+          <div class="material-line"><span>準備材料</span><ul id="result-materials"></ul></div>
+          <ol id="result-steps" class="steps"></ol>
+        </div>
+        <div class="panel" data-panel="questions" role="tabpanel" id="panel-questions" aria-labelledby="tab-questions" tabindex="0" hidden>
+          <h4>引導學生討論</h4><ol id="result-questions" class="prompt-list"></ol>
+        </div>
+        <div class="panel" data-panel="outcomes" role="tabpanel" id="panel-outcomes" aria-labelledby="tab-outcomes" tabindex="0" hidden>
+          <h4>學生應完成的成果</h4><ul id="result-outcomes" class="prompt-list"></ul>
+        </div>
+        <noscript><p class="noscript">請啟用 JavaScript 來切換教案內容及使用 Gemini。</p></noscript>
+      </section>
+    </div>
+  </main>
+  <footer class="wrap footer"><span>課堂活動設計室</span><span>使用 Gemini 生成內容，請依班級情況調整。</span></footer>
+  <script>
+const samplePlan = {
+  title: "校園減塑行動",
+  summary: "從午餐或下課時常見的一次性塑膠用品出發，透過觀察和記錄找出使用最多的品項，並提出一個班上能試行的減塑方法。",
+  activity: {
+    title: "班級塑膠使用調查",
+    materials: ["紙筆或平板", "簡單的分類記錄表", "海報紙或共用白板"],
+    steps: [
+      {
+        title: "找出觀察項目",
+        detail: "以四人小組討論班上常見的一次性用品。選出三個類別，例如飲料杯、吸管與塑膠餐具。",
+        minutes: 8,
+      },
+      {
+        title: "分組記錄與比較",
+        detail: "根據小組成員今天的使用情形，逐項記下數量。比對各組結果，圈出全班使用次數最多的類別。",
+        minutes: 15,
+      },
+      {
+        title: "設計一項減塑提案",
+        detail: "根據記錄挑一個優先改善的項目。寫下可行的做法、預計遇到的困難，以及下週要用什麼數字判斷有沒有效。",
+        minutes: 15,
+      },
+      {
+        title: "分享並選出試行方案",
+        detail: "各組簡短分享，說明哪一筆觀察支持這個提案。全班選出一項可在下週試行的做法。",
+        minutes: 7,
+      },
+    ],
+  },
+  questions: [
+    "哪一類一次性塑膠用品使用最多？你們的記錄提供了什麼證據？",
+    "如果在不同的日子做調查，結果可能有什麼差異？怎麼讓觀察更具代表性？",
+    "哪種減塑做法最適合我們班？推行時誰可能遇到困難，可以怎麼調整？",
+  ],
+  outcomes: [
+    "每組繳交一張記錄表，列出至少三類用品及各類的使用次數。",
+    "用一筆調查數據說明優先改善的項目，並說出這份調查的一項限制。",
+    "提出一項可試行的減塑做法，並寫出一個可以在下週追蹤的成效指標。",
+  ],
+};
+
+const form = document.getElementById("activity-form");
+const topicInput = document.getElementById("topic");
+const gradeInput = document.getElementById("grade");
+const durationInput = document.getElementById("duration");
+const focusInput = document.getElementById("focus");
+const topicCount = document.getElementById("topic-count");
+const generateButton = document.getElementById("generate");
+const generateLabel = document.getElementById("generate-label");
+const idleGenerateLabel = generateLabel.textContent;
+const formError = document.getElementById("form-error");
+const results = document.getElementById("results");
+const sampleLabel = document.getElementById("sample-label");
+const copyButton = document.getElementById("copy-plan");
+const copyLabel = copyButton.querySelector("span");
+const idleCopyLabel = copyLabel?.textContent;
+const copyStatus = document.getElementById("copy-status");
+const tabs = Array.from(document.querySelectorAll("[data-tab]"));
+const panels = Array.from(document.querySelectorAll("[data-panel]"));
+const generationUrl = resolveGenerationUrl();
+
+let displayedPlan = samplePlan;
+let copyLabelTimeout;
+
+function resolveGenerationUrl() {
+  const configuredUrl = document.querySelector('meta[name="generation-api"]')?.content.trim();
+  if (configuredUrl) {
+    try {
+      const url = new URL(configuredUrl, window.location.href);
+      const secure = url.protocol === "https:";
+      const local = url.protocol === "http:" && url.origin === window.location.origin;
+      if ((secure || local) && !url.username && !url.password && !url.search && !url.hash) {
+        return url.href;
+      }
+    } catch {
+      // An invalid override falls back to the server hosting this page.
+    }
+  }
+  return "/api/generate";
+}
+
+function renderList(id, values) {
+  const items = values.map((value) => {
+    const item = document.createElement("li");
+    item.textContent = value;
+    return item;
+  });
+  document.getElementById(id).replaceChildren(...items);
+}
+
+function renderPlan(plan) {
+  document.getElementById("result-title").textContent = plan.title;
+  document.getElementById("result-summary").textContent = plan.summary;
+  document.getElementById("result-activity-title").textContent = plan.activity.title;
+  renderList("result-materials", plan.activity.materials.length ? plan.activity.materials : ["無需額外材料"]);
+  renderList("result-questions", plan.questions);
+  renderList("result-outcomes", plan.outcomes);
+
+  const steps = plan.activity.steps.map((step) => {
+    const item = document.createElement("li");
+    const heading = document.createElement("div");
+    const title = document.createElement("strong");
+    const time = document.createElement("span");
+    const detail = document.createElement("p");
+
+    heading.className = "step-heading";
+    title.textContent = step.title;
+    time.className = "step-time";
+    time.textContent = `${step.minutes} 分鐘`;
+    detail.textContent = step.detail;
+    heading.append(title, time);
+    item.append(heading, detail);
+    return item;
+  });
+  document.getElementById("result-steps").replaceChildren(...steps);
+  displayedPlan = plan;
+}
+
+function showTab(name, focusTab = false) {
+  for (const tab of tabs) {
+    const selected = tab.dataset.tab === name;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    if (selected && focusTab) tab.focus();
+  }
+  for (const panel of panels) {
+    panel.hidden = panel.dataset.panel !== name;
+  }
+}
+
+function updateTopicCount() {
+  if (topicCount) topicCount.textContent = `${topicInput.value.length} / ${topicInput.maxLength}`;
+}
+
+function setFormError(message = "") {
+  formError.hidden = !message;
+  formError.textContent = message;
+}
+
+async function generatePlan(event) {
+  event.preventDefault();
+  if (generateButton.disabled) return;
+
+  setFormError();
+  const topic = topicInput.value.trim();
+  const focus = focusInput.value.trim();
+  if (topic.length < 2) {
+    setFormError("請輸入至少兩個字的課堂主題。");
+    topicInput.setAttribute("aria-invalid", "true");
+    topicInput.focus();
+    return;
+  }
+  topicInput.removeAttribute("aria-invalid");
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 50_000);
+
+  generateButton.disabled = true;
+  generateLabel.textContent = "正在設計活動…";
+  results.setAttribute("aria-busy", "true");
+  copyStatus.textContent = "";
+
+  try {
+    const response = await fetch(generationUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      redirect: "error",
+      credentials: "omit",
+      signal: controller.signal,
+      body: JSON.stringify({ topic, grade: gradeInput.value, duration: Number(durationInput.value), focus }),
+    });
+    if (response.status === 401 || response.status === 503) {
+      setFormError("Gemini 生成服務暫時無法使用，請稍後再試。");
+      return;
+    }
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      setFormError(data?.error || "目前無法連線到 AI 服務，請稍後再試。");
+      return;
+    }
+    if (!data?.activity) {
+      setFormError("目前無法讀取 AI 產生的內容，請再試一次。");
+      return;
+    }
+
+    renderPlan(data);
+    sampleLabel.textContent = "AI 生成";
+    showTab("activity");
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      results.scrollIntoView({ block: "start" });
+    }
+  } catch (error) {
+    setFormError(error.name === "AbortError" ? "這次產生的時間較長，請再試一次。" : "目前無法連線到 AI 服務，請稍後再試。");
+  } finally {
+    clearTimeout(timeout);
+    generateButton.disabled = false;
+    generateLabel.textContent = idleGenerateLabel;
+    results.removeAttribute("aria-busy");
+  }
+}
+
+function planAsText(plan) {
+  return [
+    plan.title,
+    plan.summary,
+    `實作活動｜${plan.activity.title}`,
+    `所需材料｜${plan.activity.materials.join("、") || "無需額外材料"}`,
+    plan.activity.steps.map((step, index) => `${index + 1}. ${step.title}（${step.minutes} 分鐘）\n${step.detail}`).join("\n"),
+    `討論題\n${plan.questions.map((question, index) => `${index + 1}. ${question}`).join("\n")}`,
+    `學習成果要求\n${plan.outcomes.map((outcome, index) => `${index + 1}. ${outcome}`).join("\n")}`,
+  ].join("\n\n");
+}
+
+function copyWithSelection(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.readOnly = true;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.append(textarea);
+  textarea.select();
+  try {
+    return document.execCommand("copy");
+  } finally {
+    textarea.remove();
+    copyButton.focus();
+  }
+}
+
+async function copyPlan() {
+  const text = planAsText(displayedPlan);
+  let label;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else if (!copyWithSelection(text)) {
+      throw new Error("Clipboard unavailable");
+    }
+    copyStatus.textContent = "已複製完整活動設計。";
+    label = "已複製";
+  } catch {
+    copyStatus.textContent = "無法使用剪貼簿，請選取頁面上的內容手動複製。";
+    label = "複製失敗";
+  }
+  if (copyLabel) {
+    clearTimeout(copyLabelTimeout);
+    copyLabel.textContent = label;
+    copyLabelTimeout = setTimeout(() => {
+      copyLabel.textContent = idleCopyLabel;
+    }, 2200);
+  }
+}
+
+for (const [index, tab] of tabs.entries()) {
+  const name = tab.dataset.tab;
+  const panel = panels.find((candidate) => candidate.dataset.panel === name);
+  tab.id ||= `tab-${name}`;
+  tab.setAttribute("role", "tab");
+  if (panel) {
+    panel.id ||= `panel-${name}`;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", tab.id);
+    panel.tabIndex = 0;
+    tab.setAttribute("aria-controls", panel.id);
+  }
+  tab.addEventListener("click", () => showTab(name));
+  tab.addEventListener("keydown", (event) => {
+    const nextIndexes = {
+      ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+      ArrowRight: (index + 1) % tabs.length,
+      Home: 0,
+      End: tabs.length - 1,
+    };
+    if (!Object.hasOwn(nextIndexes, event.key)) return;
+    event.preventDefault();
+    showTab(tabs[nextIndexes[event.key]].dataset.tab, true);
+  });
+}
+
+for (const button of document.querySelectorAll("[data-topic]")) {
+  button.addEventListener("click", () => {
+    topicInput.value = button.dataset.topic;
+    topicInput.dispatchEvent(new Event("input"));
+    topicInput.focus();
+  });
+}
+
+topicInput.addEventListener("input", () => {
+  updateTopicCount();
+  if (topicInput.hasAttribute("aria-invalid")) {
+    topicInput.removeAttribute("aria-invalid");
+    setFormError();
+  }
+});
+form.addEventListener("submit", generatePlan);
+copyButton.addEventListener("click", copyPlan);
+updateTopicCount();
+renderPlan(samplePlan);
+showTab("activity");
+  </script>
+</body>
+</html>
